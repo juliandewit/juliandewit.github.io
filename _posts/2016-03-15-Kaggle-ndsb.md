@@ -2,7 +2,7 @@
 layout:     post
 title:      "Diagnosing Heart Diseases with Deep Neural Networks"
 date:       2016-03-15 00:00:00
-author:     "Ira Korshunova"
+author:     "Test"
 header-img: "img/heart/dissection.jpg"
 ---
 
