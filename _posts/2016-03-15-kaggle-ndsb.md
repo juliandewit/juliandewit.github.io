@@ -1,8 +1,8 @@
 ---
 layout:     post
-title:      "Diagnosing Heart Diseases with Deep Neural Networks"
+title:      "My solution for the second national datascience bowl"
 date:       2016-03-15 00:00:00
-author:     "Test"
+author:     "Julian de Wit"
 ---
 
 
