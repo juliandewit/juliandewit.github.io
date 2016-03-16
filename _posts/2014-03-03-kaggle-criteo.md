@@ -10,6 +10,5 @@ This document describes the 4th prize solution to the [Criteo Labs display adver
 
 ## the rest will be converted later
 
-![_config.yml]({{ site.baseurl }}/images/config.png)
+[See the original document](https://github.com/juliandewit/kaggle_criteo/blob/master/ModelDocumentation.pdf)
 
-The easiest way to make your first post is to edit this one. Go into /_posts/ and update the Hello World markdown file. For more instructions head over to the [Jekyll Now repository](https://github.com/barryclark/jekyll-now) on GitHub.
