@@ -44,7 +44,7 @@ After getting an example running I started to experiment with different paramete
 * Heavy dropout helped for generalization but it was hard to determine where to apply it. I choose upstream after the shortcut merges.
 * Adding more layers unexpectedly quickly led to diminishing returns
 * Adding more filters per layer quicky showed no improvement
-* Extreme weights sharing between layers [suggested here](http://www.xlhu.cn/papers/Liang15-nips.pdf) hardly led to worse results but also not better results
+
 
 
 
