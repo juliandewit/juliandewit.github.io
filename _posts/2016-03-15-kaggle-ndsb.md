@@ -63,13 +63,13 @@ I used padding for the convolutional layers to not let them decrease output shap
 | pool2         | Max pool      | Stride 2 2x2      |  2, 64, 42, 42 |
 
 
-<table>
+<table with="90%">
 <thead>
 	<tr>
-	<th>Name</th>
-	<th>Type</th>
-	<th>Size</th>
-	<th>Output shape</th>
+	<th><b>name</b></th>
+	<th><b>type</b></th>
+	<th><b>size</b></th>
+	<th><b>output shape</b></th>
 	</tr>
 </thead>
 <tbody>
