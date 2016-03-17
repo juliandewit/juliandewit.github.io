@@ -15,7 +15,9 @@ Of course things turned out to be a bit harder then expected. First of all, the 
 
 ## Preprocessing
 The MRI images were provided in the DICOM format. The DICOM files contained an MRI scan and lots of metadata. The preprocessing  consisted of three paths. The first step was to extract the images from the file and make them uniform and easier to see and process.
-Second, the datacleaning step needed as much information on how the scanning process took place. Interesting fields were patient-orientation, scan-time, slice-location, pixel-area and a few others. The third step was to find useful metadata fields and add them to the train.csv file to have more features to train upon during the calibration step. Examples of interesting features were age, sex, slice-count, slice-distance and a few others.
+Second, the datacleaning step needed as much information on how the scanning process took place. Interesting fields were patient-orientation, scan-time, slice-location, pixel-area and a few others. The second step was to find useful metadata fields that could be used for the data-cleaning and calibration step. Examples of interesting features were age, sex, slice-count, slice-distance, patient-orientation, scan-time and a few others.
+
+All images were taken at different scales (reflected in the pixel-area property). My hunch was that this is done to get more uniform pictures of the heart. Small hearts would be zoomed in and bigger hart would be zoomed out. By just looking at the images I still saw a lot of variance and the picture just did not look very uniform. Therefore I decided to scale every image by the pixel-area^2 factor. This was for every image 1 pixel respresented the same area. After scaling the images I noted that the heart was always at the same location
 
 
 
