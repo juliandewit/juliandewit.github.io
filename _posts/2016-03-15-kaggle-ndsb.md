@@ -63,7 +63,31 @@ I used padding for the convolutional layers to not let them decrease output shap
 | pool2         | Max pool      | Stride 2 2x2      |  2, 64, 42, 42 |
 
 
+<table>
+<thead>
+	<tr>
+	<th>Name</th>
+	<th>Type</th>
+	<th>Size</th>
+	<th>Output shape</th>
+	</tr>
+</thead>
+<tbody>
+	<tr>
+		<th>input</th>
+		<th>Input</th>
+		<th>Cropped b&w</th>
+		<th>2,  1,168,168</th>
+	</tr>
+	<tr>
+		<th>conv1</th>
+		<th>Convolution</th>
+		<th>32 filters of 3x3</th>
+		<th> 2, 32,168,168</th>
+	</tr>	
+</tbody>
 
+</table>
 
 
 
