@@ -26,6 +26,10 @@ Since every patient had around 10 slices that meant that I had to label around 2
 
 After I trained a segmented on the 100 patients and made a first submission (#3 at that time while the competition was already 2 months underway my confidence of my approach grew. That motivated me to improve my segmenter and label more images. Most people call this boring work but I actually enjoyed the labeling. Even if you are out of ideas you still have the feeling that you are making progress. Also many high-payed overworked cardiac experts must devote a large portion of their time to this work. I figured that if I did my work right my effort would be neglectable to the effort that could be spared with the final solution. I did However notice more and more diminishing returns for every new batch I labeled.
 
+Like everyone I started to notice the outlier patients that were the biggest barrier to get a higher score. At first I wanted to apply [active learning](https://en.wikipedia.org/wiki/Active_learning_(machine_learning)) to boost hard examples by taking images from other frames than 1 and 12. However, with all the discussion on the forums about wat was and was not allowed I was afraid that people might think that I was actively targetting the test-test with the extra examples so I dropped this idea. However, I think an improvement is possible by boosting hard examples.
+
+## Image segmentation with an U-net
+When you searched the literature 2 months ago on images segmentation with CNN's there was no clear "winner" architecture.
 
 
 
