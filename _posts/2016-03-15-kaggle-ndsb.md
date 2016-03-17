@@ -35,6 +35,16 @@ It was a lucky accident that I stubled upon the paper on the [u-net architecture
 
 The paper was very clear and readable and I had a prototype running in [mxnet](https://github.com/dmlc/mxnet) without much effort. As someone that deploys deep learning systems to various targets (embedded, windows, linux, cloud etc) in various programming languages (python, c++, c#) I really recommend this library. 
 
+After getting an example running I started to experiment with different parameters and settings. Below a few key observations and improvements are enumerated. 
+
+* Segmentation nets are less numerically stable than normal classification/regression net. I relied heavily on batch normalization.
+* Smaller batch sizes yielded better scores and were more numerically stable. I settled for batchsize = 2 in the end.
+* The shortcut connection give a significant improvement during training. 
+* I used mean squared error as a loss function but that was not optimal. Esp. since different imagesizes gave uncomparable results
+* Heavy dropout helped for generalization but it was hard to determine where to apply it. I choose upstream after the shortcut merges.
+* Adding more layers unexpectedly quickly led to diminishing returns
+* Adding more filters per layer quicky showed no improvement
+* Extreme weights sharing between layers [suggested here](http://www.xlhu.cn/papers/Liang15-nips.pdf) hardly led to worse results but also not better results
 
 
 
