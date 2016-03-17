@@ -28,7 +28,7 @@ After I trained a segmented on the 100 patients and made a first submission (#3 
 
 Like everyone I started to notice the outlier patients that were the biggest barrier to get a higher score. At first I wanted to apply [active learning](https://en.wikipedia.org/wiki/Active_learning_(machine_learning)) to boost hard examples by taking images from other frames than 1 and 12. However, with all the discussion on the forums about wat was and was not allowed I was afraid that people might think that I was actively targetting the test-test with the extra examples so I dropped this idea. However, I think an improvement is possible by boosting hard examples.
 
-## Image segmentation with the U-net architecture implemented in MxNet
+## Image segmentation with the U-net architecture (built in MxNet)
 When you searched the literature 2 months ago on images segmentation with CNN's there was no clear "winner" architecture. There were the reasonably successful sliding widow approaches [cirecan, lecun]. However, from first hand experience I knew they were cumbersome to use and far from perfect. The benchmark example provided by Mike Kim used a fully convolutional neural net. These are easier to use but they tend to give a very coarse resolution when you go deep. I read some papers about using Conditional Random Fields or recurrent nets as a post processing to improve the detail. However, both approached did not really appeal to me due to the added complexity.  
 
 
