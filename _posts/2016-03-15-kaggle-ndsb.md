@@ -40,16 +40,16 @@ The paper was very clear and readable and I had a prototype running in [mxnet](h
 
 After getting an example running I started to experiment with different parameters and settings. Below a few key observations and improvements are enumerated. 
 
-* Segmentation nets are less numerically stable. I relied heavily on batch normalization.
-* Smaller batch sizes yielded better scores and stability. I settled for batchsize = 2.
-* Elastic deformations were by far the most augmentations
-* The shortcut connection give a significant improvement during training. 
-* Logistic regression was better loss than RMSE but better alternative quite possibly exist.
-* Dropout helped but it was hard to determine where to apply it. I choose upstream after the shortcut merges.
-* Adding more layers quickly led to diminishing returns
-* Adding more filters per layer quicky showed no improvement
-* It was hard, if not impossible to overfit the network.
-* Training time was around 5 hours
+1. Segmentation nets are numerically unstable. I relied heavily on batch normalization.
+2. Smaller batch sizes yielded better scores and stability. I settled for batchsize = 2.
+3. Elastic deformations were by far the most augmentations
+4. The shortcut connection give a significant improvement during training. 
+5. Logistic regression was better loss than RMSE but better alternative quite possibly exist.
+6. Dropout helped but it was hard to determine where to apply it. I choose upstream after the shortcut merges.
+7. Adding more layers quickly led to diminishing returns
+8. Adding more filters per layer quicky showed no improvement
+9. It was hard, if not impossible to overfit the network.
+10. Training time was around 5 hours
 
 After a lot of trial and error I ended up with the following network.
 Note that I used relu activations and batch normalisation after every convolution. 
@@ -63,7 +63,7 @@ Patients with many heavily contracted LV's seemed to be a little underestimated 
 Theoretically, once you have the LV areas per slice, the step to compute the volumes is straight forward. You take the slice areas and multiply by their thickness and then add. You can even be more fancy and compute the volumes using frustum of a cone approximations like in the tutorials. I did that but it only gave a small improvement.
 It was much more beneficial to put more effort in the data cleaning process. Taking MRI's is obviously a very error prone process and many computations went wrong because of irregularities in the data. Below a number of essential cleaning steps are discuessed.
 
-1. Patients with virtually no slices<br>
+1. Patients with virtually no slices,<br>
    Patient 595 and 599 only had 3 slices. I decided to drop them and predict their volumes later on based on averages for age and sex.
 2. No real guide for slice thickness<br>
   I eventually used the difference between slice locations to determine the slice thickness. Although the slice location was not 100% perfect other calculations based on image orientation and location also had their problems so I settled for the simplest option.
