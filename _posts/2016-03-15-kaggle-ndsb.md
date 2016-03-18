@@ -44,50 +44,28 @@ After getting an example running I started to experiment with different paramete
 * Smaller batch sizes yielded better scores and stability. I settled for batchsize = 2.
 * Elastic deformations were by far the most augmentations
 * The shortcut connection give a significant improvement during training. 
-* Mean squared error as a loss function but that was not optimal. Esp. since different imagesizes gave uncomparable results
-* Heavy dropout helped for generalization but it was hard to determine where to apply it. I choose upstream after the shortcut merges.
-* Adding more layers unexpectedly quickly led to diminishing returns
+* Logistic regression was better loss than RMSE but better alternative quite possibly exist.
+* Dropout helped but it was hard to determine where to apply it. I choose upstream after the shortcut merges.
+* Adding more layers quickly led to diminishing returns
 * Adding more filters per layer quicky showed no improvement
+* It was hard, if not impossible to overfit the network.
+* Training time was around 5 hours
 
 After a lot of trial and error I ended up with the following network.
 Note that I used relu activations and batch normalisation after every convolution. 
 I used padding for the convolutional layers to not let them decrease output shape.
+Below the architecture is displayed. Note that my approach is very much trial and error and many decisions don't have a grounded theory.
+
+The seqmentation results were quite impressive. They "easy cases" where virtually perfect. Only with very big hearts sometimes the net was a bit unsure. Cases where the LV tissue was only half around were nicely filled up with a "half moon"-like overlay. There were some cases where the net was confused but this was almost always with strange outliers of which it never had seen any examples.
+Patients with many heavily contracted LV's seemed to be a little underestimated by the system. This is probably because I should have labeled contracted LV's more generous. Below, a few cases are discussed.
 
 
-| Name          | Type          | Size              | Output shape   |
-| ------------- |---------------|-------------------|----------------|
-| input         | Input         | Cropped b&w       |  2,  1,168,168 |
-| conv1         | Convolution   | 32 filters of 3x3 |  2, 32,168,168 |
-| pool1         | Max pool      | Stride 2 2x2      |  2, 32, 84, 84 |
-| conv2         | Convolution   | 64 filters of 3x3 |  2, 64, 84, 84 |
-| pool2         | Max pool      | Stride 2 2x2      |  2, 64, 42, 42 |
 
 
-<table with="90%">
-<thead>
-	<tr>
-	<th><b>name</b></th>
-	<th><b>type</b></th>
-	<th><b>size</b></th>
-	<th><b>output shape</b></th>
-	</tr>
-</thead>
-<tbody>
-	<tr>
-		<th>input</th>
-		<th>Input</th>
-		<th>Cropped b&w</th>
-		<th>2,  1,168,168</th>
-	</tr>
-	<tr>
-		<th>conv1</th>
-		<th>Convolution</th>
-		<th>32 filters of 3x3</th>
-		<th> 2, 32,168,168</th>
-	</tr>	
-</tbody>
 
-</table>
+
+
+
 
 
 
