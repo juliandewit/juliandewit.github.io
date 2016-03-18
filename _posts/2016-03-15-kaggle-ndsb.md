@@ -22,7 +22,7 @@ All images were taken at different scales (reflected in the pixel-area property)
 The second preprocessing path was to find useful metadata fields that could be used for the data-cleaning and calibration step. Examples of interesting features were age, sex, slice-count, slice-distance, image-orientation, scan-time, image-size and a few others. The features were stored in a separate csv file for later use.
 
 ## Hand labeling
-The traindata of the competition only contained the final determined volumes of the left ventricle. There was no information on how this volume was obtained. there was the possibility of using the SunnybrookLINK dataset but the cases in that set were much more simple than the cases I encountered in the DICOM files. Of course I was thinking of using a convolutional neural network (CNN) for the image segmentation. CNN's are great but they not a lot of traindata. Luckily I already had a overlay-drawing tool that I once built for an earlier project. I decided to label 100 patients with this tool. For every patient I took frame 1 (usually diastole) and frame 12 (usually systole). 
+The traindata of the competition only contained the final determined volumes of the left ventricle. There was no information on how this volume was obtained. there was the possibility of using the SunnybrookLINK dataset but the cases in that set were much more simple than the cases I encountered in the DICOM files. Of course I was thinking of using a convolutional neural network (CNN) for the image segmentation. CNN's are great but they need a lot of traindata. Luckily I already had a overlay-drawing tool that I once built for an earlier project. I decided to label 100 patients with this tool. For every patient I took frame 1 (usually diastole) and frame 12 (usually systole). 
 
 Since every patient had around 10 slices that meant that I had to label around 2000 images. Once I got the hang of it using my tool I was able to label around 1 patient per minute. During the labeling I encountered many confusing cases that I still don't know how to label. I scanned youtube and many papers but there were no definate answers on the internet. In the end I decided to at least be consistent. If I would be consistent then in a later stage I could brush out systematic errors during the calibration phase. Below are a number of situations that were encountered. 
 
@@ -61,7 +61,7 @@ Patients with many heavily contracted LV's seemed to be a little underestimated 
 
 ## Integrating the predictions into volumes and data cleaning.
 Theoretically, once you have the LV areas per slice, the step to compute the volumes is straight forward. You take the slice areas and multiply by their thickness and then add. You can even be more fancy and compute the volumes using frustum of a cone approximations like in the tutorials. I did that but it only gave a small improvement.
-It was much more beneficial to put more effort in the data cleaning process. Taking MRI's is obviously a very error prone process and many computations went wrong because of irregularities in the data. Below a number of essential cleaning steps are discuessed.
+It was much more beneficial to put more effort in the data cleaning process. Taking MRI's is obviously a very error prone process and many computations went wrong because of irregularities in the data. Below a number of essential cleaning steps are discussed.
 
 1. Patients with virtually no slices.<br>
    Patient 595 and 599 only had 3 slices. I decided to drop them and predict their volumes later on based on averages for age and sex.
@@ -83,8 +83,32 @@ The second approach is probably what doctors do but somehow the first approach w
 can easily be picked up by the gradient boosting procedure that I used for calibrating the volumes.
 
 ## Calibration
+From the labels to the segmenter to the volume computation there were plenty of opportunities to introduce systematic errors. The traindata for the competition provided the "real" volumes as determined by the cardiac specialists. It would be wasteful to not use this data to improve the estimations.
+During a "calibration" step I tried to detect and mitigate such systematic error by using a gradient boosting regressor with the raw estimations and same extra features. I tried a lot of features that had great potential for predicting the error. Examples are the amount of "unsureness" of my segmenter expressed in low probability pixels,
+the biggest slice, the number of dropped slices etc. However it turned out that the regular features provided in the dicom files provided the most benefit. Next to the raw predictions other helpful features were age, sex, angle, slice-thickness and slice-count.
 
-0.005 difference between 3rd and 4rd
+There were a number of targets that could be regressed on. To volume, the ratio between real volume and estimated volume and the error (residual). The last one gave the best improvements. The gradient boosting regressor tried to predict the error in the estimation given all the features.
+With the prediction of that error I could adjust my estimation and this led to a better overall score. To avoid the risk of overfitting it was necessary to train the segmenter in folds. For more information about two level models [this](http://mlwave.com/kaggle-ensembling-guide/) is a nice guide.
+Training diffent folds slowed everything down quite a bit but in the end I think it was well worth the effort. Below is a table of the improvements in mean absolute errors.
+
+As can be seen the MAE improved by 1 ml which was quite a bit. On the leaderboard the calibration step provided a boost in the score of around 0.0005 which could exactly mean the difference between #3 and #4 on the leaderboard.
+
+## Submission
+Kaggle came up with an evaluation function which I came to like very much. This was the [Continuous Rank Probability Score](http://www.eumetcal.org/resources/ukmeteocal/verification/www/english/msg/ver_prob_forec/uos3b/uos3b_ko1.htm). Next to an accurate prediction you also had to tell how sure you were of your prediction.
+I tried a few strategies but the one that worked best for me was the following. For a prection I determined the standard deviation in the errors for other prediction with similar volumes. Then I plugged the estimated volume and the standard deviation in a [cumulative density function](https://en.wikipedia.org/wiki/Cumulative_distribution_function).
+The resulting values were used for my submission. This was a simple and stable procedure that was aware of errors/variance in the ground thruth and in the estimations. The ideal batch size for determining the standard deviation was between 30 and 60.
+
+## Some conclusions and remarks
+First of all I'm very happy with the resulting model. It is simple and straightforward and there are a number of possible improvements if one were to use this model in a real-life scenario.
+Below are a number of possible improvements.
+
+1. Hand-labeling could be done by a real expert.
+I am convinces that I labeled some of the cases completely wrong. Labels provided by experts would most likely drastically improve the performance.
+2. Active learning
+I was afraid to boost the train images of cases where the segmenter had a hard time. People might accuse me of cheating. However [active learning](https://en.wikipedia.org/wiki/Active_learning_(machine_learning)) is a perfectly valid aproach for improving the performance of a system like this.
+
+## Thanks
+
 
 
 
