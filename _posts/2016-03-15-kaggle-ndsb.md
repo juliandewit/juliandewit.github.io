@@ -77,6 +77,14 @@ It was much more beneficial to put more effort in the data cleaning process. Tak
 * Wrongly oriented slices
   In a very few occasions slices would suddenly be rotated. Luckily my segmenter did not suffer from this so there was no need to take measures against this.
  
+Another important point to not is that two volumes need to be determined at the same time. Systole (contracted) and Diastole (expanded).
+I tried two approaches for determining which frames where Systole and Diastole. The first was the frame with total volume max and min. Second was to find the image with the larges area and use that frame as diastole. Then within that series look for the smallest area and use that frame as systole.
+The second approach is probably what doctors do but somehow the first approach was more stable and worked better with the calibration step that followed. My guess the reason is that the first approach is more consistent. It structurally a bit too low for systole and a but too high for diastole. This signal 
+can easily be picked up by the gradient boosting procedure that I used for calibrating the volumes.
+
+## Calibration
+
+
 
   
   
