@@ -63,9 +63,9 @@ Patients with many heavily contracted LV's seemed to be a little underestimated 
 Theoretically, once you have the LV areas per slice, the step to compute the volumes is straight forward. You take the slice areas and multiply by their thickness and then add. You can even be more fancy and compute the volumes using frustum of a cone approximations like in the tutorials. I did that but it only gave a small improvement.
 It was much more beneficial to put more effort in the data cleaning process. Taking MRI's is obviously a very error prone process and many computations went wrong because of irregularities in the data. Below a number of essential cleaning steps are discuessed.
 
-1. Patients with virtually no slices
+1. Patients with virtually no slices<br>
    Patient 595 and 599 only had 3 slices. I decided to drop them and predict their volumes later on based on averages for age and sex.
-2. No real guide for slice thickness 
+2. No real guide for slice thickness<br>
   I eventually used the difference between slice locations to determine the slice thickness. Although the slice location was not 100% perfect other calculations based on image orientation and location also had their problems so I settled for the simplest option.
 3. Slice ordering
   Usually the MRI makes slices from the base downto the apex. But sometimes the machines seemed to get stuck or went back up again. This would result in negative slice thickneses. The fix was to order the slices based on location and not in time.
