@@ -60,7 +60,26 @@ The seqmentation results were quite impressive. They "easy cases" where virtuall
 Patients with many heavily contracted LV's seemed to be a little underestimated by the system. This is probably because I should have labeled contracted LV's more generous. Below, a few cases are discussed.
 
 ## Integrating the predictions into volumes and data cleaning.
+Theoretically, once you have the LV areas per slice, the step to compute the volumes is straight forward. You take the slice areas and multiply by their thickness and then add. You can even be more fancy and compute the volumes using frustum of a cone approximations like in the tutorials. I did that but it only gave a small improvement.
+It was much more beneficial to put more effort in the data cleaning process. Taking MRI's is obviously a very error prone process and many computations went wrong because of irregularities in the data. Below a number of essential cleaning steps are discuessed.
 
+* Patients with virtually no slices
+  Patient 595 and 599 only had 3 slices. I decided to drop them and predict their volumes later on based on averages for age and sex.
+* No real guide for slice thickness 
+  I eventually used the difference between slice locations to determine the slice thickness. Although the slice location was not 100% perfect other calculations based on image orientation and location also had their problems so I settled for the simplest option.
+* Slice ordering
+  Usually the MRI makes slices from the base downto the apex. But sometimes the machines seemed to get stuck or went back up again. This would result in negative slice thickneses. The fix was to order the slices based on location and not in time.
+* Slices of comletely different body parts
+  After ordering the slices I sometimes noticed thicknesses of 100+ mm. Since the expected thickness was around 10mm I concluded that these slices were wrong so I dropped them.
+* Missing slices
+  After putting in a maximum slice thickness there turned out to be some sliced that were 20 or even more mm but they were valid. My conclusion was that in these cases slices were missing in the sequence.
+  My measure against this was to allow for these slices as long as they fell between the base and the apex.
+* Wrongly oriented slices
+  In a very few occasions slices would suddenly be rotated. Luckily my segmenter did not suffer from this so there was no need to take measures against this.
+ 
+
+  
+  
 
 
 
