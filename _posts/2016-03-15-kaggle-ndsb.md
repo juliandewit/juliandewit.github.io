@@ -117,11 +117,11 @@ The resulting values were used for my submission. This was a simple and stable p
 First of all I'm very happy with the resulting model. It is simple and straightforward and there are a number of possible improvements if one were to use this model in a real-life scenario.
 Below are a number of possible improvements.
 
-1. *Hand-labeling by a real expert.*
-I am convinces that I labeled some of the cases completely wrong. Labels provided by experts would most likely drastically improve the performance.
-2. *Active learning (boost hard examples).*
+1. *Hand-labeling by a real expert.*<br>
+I am sure that I labeled some of the cases completely wrong. Labels provided by experts would most likely drastically improve the performance.
+2. *Active learning (boost hard examples).*<br>
 I was afraid to boost the train images of cases where the segmenter had a hard time. People might accuse me of cheating. However [active learning](https://en.wikipedia.org/wiki/Active_learning_(machine_learning)) is a perfectly valid aproach for improving the performance of a system like this.
-3. *Cleaner data.*
+3. *Cleaner data.*<br>
 The outliers in this dataset were very important in this competition. A small number of patients were responsible for the biggest loss in performance. Of course I investigated them thouroughly. However, in many cases I could not find a problem in my estimated volumes. My conclusion was that the provided volumes were plain wrong.
 The biggest outlier was [patient 429](https://www.kaggle.com/c/second-annual-data-science-bowl/forums/t/18372/some-cases-are-quite-off-from-the-true-value/104711) this patient alone was responsible for a 89ml error. Until now there is still no explanation for this strange value.
 Cases like this confused the calibration step and increased the standard deviation during the submission so they had a big impact on the final score.
