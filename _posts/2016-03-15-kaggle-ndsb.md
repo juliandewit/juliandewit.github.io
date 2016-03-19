@@ -14,6 +14,7 @@ This document describes the 3rd prize solution to the [Second National Data Scie
 After the last [retinopathy challenge](https://www.kaggle.com/c/diabetic-retinopathy-detection) I really got a taste for solving medical problems. So I was very excited about this competition. Just to get a feeling for the case I decided to manually segment a few patients and to compute the volume on paper. With the information from the DICOM files (pixel area, image location etc) one could go directly from pixels to milliliters. Without exaclty knowing how to determine which areas were part of the left ventricle I roughly got an error of ~10ml. I concluded that if I could learn the computer how to segment, it would result in a very good score. Below is the idealised schema for the solution.
 
 ![The plan](/images/plan.png)
+*Figure 1. The idealized version of my approach*
 
 Of course things turned out to be a bit harder then expected. First of all, the data was for from perfect. Second it was very hard to find information on how exactly one can determine left ventricle area on MRI images. The sunnybrook database that was provided only contained very simple examples. I decided to extend my system with a data cleaning part and a calibration step. The calibration step uses the provided volumes in the traindata to correct for systematic mistakes made with the automatic image segmenter. In the next paragraph I will try to discuss every step of the complete solution.
 
@@ -38,7 +39,7 @@ When search the literature 2 months ago on image segmentation with CNN's there i
 It was a lucky accident that I stubled upon the paper on the [u-net architecture](http://lmb.informatik.uni-freiburg.de/people/ronneber/u-net/). This architectured allowed for more detail in the segmentation by using shortcut connections from the i'th layer to the n-i'th layer. They presented a number of impressive results and as far as I could see the person that came up with the architecture now works for Google Deepmind. To me that proved that appearantly he was on to something.  Below is a schematic overview.
 
 ![U-net](/images/unet.png)
-
+*Figure x. U-net architecture*
 
 The paper was very clear and readable and I had a prototype running in [mxnet](https://github.com/dmlc/mxnet) without much effort. As someone that deploys deep learning systems to various targets (embedded, windows, linux, cloud etc) in various programming languages (python, c++, c#) I really recommend this library. 
 
