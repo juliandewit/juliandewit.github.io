@@ -111,12 +111,17 @@ The outliers in this dataset were very important in this competition. A small nu
 The biggest outlier was [patient 429](https://www.kaggle.com/c/second-annual-data-science-bowl/forums/t/18372/some-cases-are-quite-off-from-the-true-value/104711) this patient alone was responsible for a 89ml error. Until now there is still no explanation for this strange value.
 Cases like this confused the calibration step and increased the standard deviation during the submission so they had a big impact on the final score.
 
-Before the competition the doctors told during a Q&A session that errors 10ml would be acceptable. On average we are below this value. Of course there is the problem of the outliers but I am very confident that these issues can be resoved. Therefore I am conviced that this problem is.
+Before the competition the doctors told during a Q&A session that errors 10ml would be acceptable. On average we are below this value. Of course there is the problem of the outliers but I am very confident that these issues can be resoved. Therefore I would like to call this problem:
 
+![Solved](/images/solved.png)
 
 
 ## Thanks
+1. Kaggle and Booz Allen Hamilton<br> Thank you organising this complex and col challenge. There were some complaints about the whole two phase setup and the quality of the data. But if we want to solve more relevant problems instead of the usual CTR/forecasting stuff you sometimes need to try something new an take some risk.
 
+2. Mxnet<br> What can I say... great library especially when you also want to deploy your systems in real-world situation. Especially good windows support is something that is severely lacking from other libraries.
+
+3. The authors of the U-net paper.. <br> The idea was great. The paper was easy to understand with clear language and concrete examples. That is something you do not find everyday in many of the deep learning community.
 
 
 
