@@ -70,8 +70,8 @@ Below the architecture is displayed. Note that my approach is very much trial an
 The seqmentation results were quite impressive. They "easy cases" where virtually perfect. Only with very big hearts sometimes the net was a bit unsure. Cases where the LV tissue was only half around were nicely filled up with a "half moon"-like overlay. There were some cases where the net was confused but this was almost always with strange outliers of which it never had seen any examples.
 Patients with many heavily contracted LV's seemed to be a little underestimated by the system. This is probably because I should have labeled contracted LV's more generous. Below, a few cases are discussed.
 
-![Segmentation](/images/segmentation.png)
-*Figure 3. A. Normal. B. Heavy contraction.  C. Chamber only partly surrounded by LV tissue D. and E. Uncommon cases where the u-net was confused.*
+![Segmentation](/images/segmentations.png)
+*Figure 6. A. Normal. B. Heavy contraction.  C. Chamber only partly surrounded by LV tissue D. and E. Uncommon cases where the u-net was confused.*
 
 
 ## Integrating the predictions into volumes and data cleaning.
