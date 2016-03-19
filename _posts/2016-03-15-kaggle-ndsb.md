@@ -109,6 +109,9 @@ There were a number of targets that could be regressed on. The volume, the real/
 With the prediction of that error I could adjust my estimation and this led to a better overall estimation. To avoid the risk of overfitting it was necessary to train the segmenter in folds. For more information about two level models [this](http://mlwave.com/kaggle-ensembling-guide/) is a nice guide.
 Training different folds slowed everything down quite a bit but in the end I think it was well worth the effort. Below is a table of the improvements in mean absolute errors.
 
+![MAE](/images/mae.png)
+*Figure 7. Mean absolute error before and after calibration*
+
 As can be seen the MAE improved by 1 ml which was quite a bit. On the leaderboard the calibration step provided a boost in the score of around 0.0005 which is almost the difference between #3 and #4.
 
 ## Submission
