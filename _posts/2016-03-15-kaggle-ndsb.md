@@ -35,14 +35,14 @@ Since every patient had around 10 slices that meant that I had to label around 2
 ![Labeling](/images/labeling.png)
 *Figure 3. A. Easy. B. Harder since it was unclear if only the white (bloodpool) should be annoted or that the tissue should be interpreted like sponge C. Chamber only partly surrounded by LV tissue D. and E. Uncommon confusing cases .*
 
-After I trained a segmented on the 100 patients and made a first submission (#3 at that time while the competition was already 2 months underway my confidence of my approach grew. That motivated me to improve my segmenter and label more images. Most people call this boring work but I actually enjoyed the labeling. Even if you are out of ideas you still have the feeling that you are making progress. Also many high-payed overworked cardiac experts must devote a large portion of their time to this work. I figured that if I did my work right my effort would be neglectable to the effort that could be spared with the final solution. I did However notice more and more diminishing returns for every new batch I labeled.
+After I trained a segmenter on the 100 patients and made a first submission (#3 at that time while the competition was already 2 months underway my confidence of my approach grew. That motivated me to improve my segmenter and label more images. Most people call this boring work but I actually enjoyed the labeling. Even if you are out of ideas you still have the feeling that you are making progress. Also many high-payed overworked cardiac experts must devote a large portion of their time to this work. I figured that if I did my work right my effort would be neglectable to the effort that could be spared with the final solution. I did However notice more and more diminishing returns for every new batch I labeled.
 
 Like everyone I started to notice the outlier patients that were the biggest barrier to get a higher score. At first I wanted to apply [active learning](https://en.wikipedia.org/wiki/Active_learning_(machine_learning)) to boost hard examples by taking images from other frames than 1 and 12. However, with all the discussion on the forums about wat was and was not allowed I was afraid that people might think that I was actively targetting the test-test with the extra examples so I dropped this idea. However, I think an improvement is possible by boosting hard examples.
 
 ## Image segmentation with the U-net architecture (built in MxNet)
 When search the literature 2 months ago on image segmentation with CNN's there is no clear "winner" architecture. There were the reasonably successful [sliding widow approaches](http://people.idsia.ch/~ciresan/data/ISBI2012.pdf). However, from first hand experience I knew they were a bit cumbersome to use and far from perfect. The benchmark example provided by Mike Kim used a [fully convolutional neural net](http://www.cs.berkeley.edu/~jonlong/long_shelhamer_fcn.pdf). These are easier to use but they tend to give a rather coarse resolution when you go deep. There are some papers about using [conditional random fields or recurrent nets](http://www.robots.ox.ac.uk/~szheng/papers/CRFasRNN.pdf) as a post processing to improve the detail. However, both approached did not really appeal to me due to the added complexity. Also in this example there were only two classes. [Here](https://github.com/kjw0612/awesome-deep-vision#semantic-segmentation) us an exaustive list of various approaches.
 
-It was a lucky accident that I stubled upon the paper on the [u-net architecture](http://lmb.informatik.uni-freiburg.de/people/ronneber/u-net/). This architectured allowed for more detail in the segmentation by using shortcut connections from the i'th layer to the n-i'th layer. They presented a number of impressive results and as far as I could see the person that came up with the architecture now works for Google Deepmind. To me that proved that appearantly he was on to something.  Below is a schematic overview.
+It was a lucky accident that I stumbled upon the paper on the [u-net architecture](http://lmb.informatik.uni-freiburg.de/people/ronneber/u-net/). This architectured allowed for more detail in the segmentation by using shortcut connections from the i'th layer to the n-i'th layer. They presented a number of impressive results and as far as I could see the person that came up with the architecture now works for Google Deepmind. To me that proved that appearantly he was on to something.  Below is a schematic overview.
 
 ![U-net](/images/unet.png)
 *Figure 4. U-net architecture*
@@ -67,7 +67,10 @@ Note that I used relu activations and batch normalization after every convolutio
 I used padding for the convolutional layers to not let them decrease output shape.
 Below the architecture is displayed. Note that my approach is very much trial and error and many decisions don't have a grounded theory.
 
-The seqmentation results were quite impressive. They "easy cases" where virtually perfect. Cases where the LV tissue was only half around were nicely filled up with a "half moon"-like overlay. There were some cases where the net was confused but this was almost always with strange outliers of which it never had seen any examples before.
+![Segmenter network](/images/segmenter_net.png)
+*Figure 5. Network definition used for this solution*
+
+The segmentation results were quite impressive. The "easy cases" where virtually perfect. Cases where the LV tissue was only half around were nicely filled up with a "half moon"-like overlay. There were some cases where the net was confused but this was almost always due to strange outliers of which it never had seen any examples before.
 Patients with many heavily contracted LV's seemed to be a little underestimated by the system. This is probably because I should have labeled contracted LV's more generous. Below, a few cases are discussed.
 
 ![Segmentation](/images/segmentations.png)
@@ -94,19 +97,19 @@ It was much more beneficial to put more effort in the data cleaning process. Tak
  
 Another important point to not is that two volumes need to be determined at the same time. Systole (contracted) and Diastole (expanded).
 I tried two approaches for determining which frames where Systole and Diastole. The first was the frame with total volume max and min. Second was to find the image with the larges area and use that frame as diastole. Then within that series look for the smallest area and use that frame as systole.
-The second approach is probably what doctors do but somehow the first approach was more stable and worked better with the calibration step that followed. My guess the reason is that the first approach is more consistent. It structurally a bit too low for systole and a but too high for diastole. This signal 
+The second approach is probably what doctors do but somehow the first approach was more stable and worked better with the calibration step that followed. My guess the reason is that the first approach is more consistent. It structurally a bit too low for systole and a bit too high for diastole. This signal 
 can easily be picked up by the gradient boosting procedure that I used for calibrating the volumes.
 
 ## Calibration
 From the labels to the segmenter to the volume computation there were plenty of opportunities to introduce systematic errors. The traindata for the competition provided the "real" volumes as determined by the cardiac specialists. It would be wasteful to not use this data to improve the estimations.
-During a "calibration" step I tried to detect and mitigate such systematic error by using a gradient boosting regressor with the raw estimations and same extra features. I tried a lot of features that had great potential for predicting the error. Examples are the amount of "unsureness" of my segmenter expressed in low probability pixels,
+During a "calibration" step I tried to detect and mitigate systematic error by using a gradient boosting regressor with the raw estimations and same extra features. I tried a lot of features that had great potential for predicting the error. Examples are the amount of "unsureness" of my segmenter expressed in low probability pixels,
 the biggest slice, the number of dropped slices etc. However it turned out that the regular features provided in the dicom files provided the most benefit. Next to the raw predictions other helpful features were age, sex, angle, slice-thickness and slice-count.
 
-There were a number of targets that could be regressed on. To volume, the ratio between real volume and estimated volume and the error (residual). The last one gave the best improvements. The gradient boosting regressor tried to predict the error in the estimation given all the features.
-With the prediction of that error I could adjust my estimation and this led to a better overall score. To avoid the risk of overfitting it was necessary to train the segmenter in folds. For more information about two level models [this](http://mlwave.com/kaggle-ensembling-guide/) is a nice guide.
-Training diffent folds slowed everything down quite a bit but in the end I think it was well worth the effort. Below is a table of the improvements in mean absolute errors.
+There were a number of targets that could be regressed on. The volume, the real/estimated ratio and the error (residual). The last one gave the best improvements. The gradient boosting regressor tried to predict the error in the estimation given all the features.
+With the prediction of that error I could adjust my estimation and this led to a better overall estimation. To avoid the risk of overfitting it was necessary to train the segmenter in folds. For more information about two level models [this](http://mlwave.com/kaggle-ensembling-guide/) is a nice guide.
+Training different folds slowed everything down quite a bit but in the end I think it was well worth the effort. Below is a table of the improvements in mean absolute errors.
 
-As can be seen the MAE improved by 1 ml which was quite a bit. On the leaderboard the calibration step provided a boost in the score of around 0.0005 which could exactly mean the difference between #3 and #4 on the leaderboard.
+As can be seen the MAE improved by 1 ml which was quite a bit. On the leaderboard the calibration step provided a boost in the score of around 0.0005 which is almost the difference between #3 and #4.
 
 ## Submission
 Kaggle came up with an evaluation function which I came to like very much. This was the [Continuous Rank Probability Score](http://www.eumetcal.org/resources/ukmeteocal/verification/www/english/msg/ver_prob_forec/uos3b/uos3b_ko1.htm). Next to an accurate prediction you also had to tell how sure you were of your prediction.
@@ -123,7 +126,7 @@ I am sure that I labeled some of the cases completely wrong. Labels provided by 
 I was afraid to boost the train images of cases where the segmenter had a hard time. People might accuse me of cheating. However [active learning](https://en.wikipedia.org/wiki/Active_learning_(machine_learning)) is a perfectly valid aproach for improving the performance of a system like this.
 3. *Cleaner data.*<br>
 The outliers in this dataset were very important in this competition. A small number of patients were responsible for the biggest loss in performance. Of course I investigated them thouroughly. However, in many cases I could not find a problem in my estimated volumes. My conclusion was that the provided volumes were plain wrong.
-The biggest outlier was [patient 429](https://www.kaggle.com/c/second-annual-data-science-bowl/forums/t/18372/some-cases-are-quite-off-from-the-true-value/104711) this patient alone was responsible for a 89ml error. Until now there is still no explanation for this strange value.
+The biggest outlier was [patient 429](https://www.kaggle.com/c/second-annual-data-science-bowl/forums/t/18372/some-cases-are-quite-off-from-the-true-value/104711). This patient alone was responsible for a 89ml error. Until now there is still no explanation for this strange value.
 Cases like this confused the calibration step and increased the standard deviation during the submission so they had a big impact on the final score.
 
 Before the competition the doctors told during a Q&A session that errors 10ml would be acceptable. On average we are below this value. Of course there is the problem of the outliers but I am very confident that these issues can be resoved. Therefore I would like to call this problem:
@@ -131,10 +134,10 @@ Before the competition the doctors told during a Q&A session that errors 10ml wo
 ![Solved](/images/solved.png)
 
 
-## Thanks
+## Thanks	
 1. *Kaggle and Booz Allen Hamilton.*<br> Thank you organising this complex and cool challenge. There were some complaints about the whole two phase setup and the quality of the data. But if we want to solve more ambitious problems than the usual CTR/forecasting stuff you sometimes need to try something new an take some risk.
 
-2. *Mxnet.*<br> What can I say... great library when you also want to deploy your systems in real-world situation. Especially good windows support is something that is severely lacking from other libraries.
+2. *Mxnet.*<br> What can I say... great library when you also want to deploy your systems in real-world situations. Especially good windows support is something that is severely lacking from most other libraries.
 
 3. *The authors of the U-net paper.* <br> The idea was great. The paper was easy to understand with clear language and concrete examples. That is something you do not find everyday in the deep learning community.
 
