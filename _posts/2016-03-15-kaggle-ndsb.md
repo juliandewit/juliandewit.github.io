@@ -28,7 +28,7 @@ All images were taken at different scales (reflected in the pixel-spacing proper
 The second preprocessing path was to find useful metadata fields that could be used for the data-cleaning and calibration step. Examples of interesting features were age, sex, slice-count, slice-distance, image-orientation, scan-time, image-size and a few others. The features were stored in a separate csv file for later use.
 
 ## Hand labeling
-The traindata of the competition only contained the final determined volumes of the left ventricle. There was no information on how this volume was obtained. there was the possibility of using the SunnybrookLINK dataset but the cases in that set were much more simple than the cases I encountered in the DICOM files. Of course I was thinking of using a convolutional neural network (CNN) for the image segmentation. CNN's are great but they need a lot of traindata. Luckily I already had a overlay-drawing tool that I once built for an earlier project. I decided to label 100 patients with this tool. For every patient I took frame 1 (usually diastole) and frame 12 (usually systole). 
+The traindata of the competition only contained the final determined volumes of the left ventricle. There was no information on how this volume was obtained. there was the possibility of using the [Sunnybrook](http://www.cardiacatlas.org/studies/sunnybrook-cardiac-data/) dataset but the cases in that set were much more simple than the cases I encountered in the DICOM files. Of course I was thinking of using a convolutional neural network (CNN) for the image segmentation. CNN's are great but they need a lot of traindata. Luckily I already had a overlay-drawing tool that I once built for an earlier project. I decided to label 100 patients with this tool. For every patient I took frame 1 (usually diastole) and frame 12 (usually systole). 
 
 Since every patient had around 10 slices that meant that I had to label around 2000 images. Once I got the hang of it using my tool I was able to label around 1 patient per minute. During the labeling I encountered many confusing cases that I still don't know how to label. I scanned youtube and many papers but there were no definate answers on the internet. In the end I decided to at least be consistent. If I would be consistent then in a later stage I could brush out systematic errors during the calibration phase. Below are a number of situations that were encountered. 
 
@@ -40,7 +40,7 @@ After I trained a segmenter on the 100 patients and made a first submission (#3 
 Like everyone I started to notice the outlier patients that were the biggest barrier to get a higher score. At first I wanted to apply [active learning](https://en.wikipedia.org/wiki/Active_learning_(machine_learning)) to boost hard examples by taking images from other frames than 1 and 12. However, with all the discussion on the forums about wat was and was not allowed I was afraid that people might think that I was actively targetting the test-test with the extra examples so I dropped this idea. However, I think an improvement is possible by boosting hard examples.
 
 ## Image segmentation with the U-net architecture (built in MxNet)
-When search the literature 2 months ago on image segmentation with CNN's there is no clear "winner" architecture. There were the reasonably successful [sliding widow approaches](http://people.idsia.ch/~ciresan/data/ISBI2012.pdf). However, from first hand experience I knew they were a bit cumbersome to use and far from perfect. The benchmark example provided by Mike Kim used a [fully convolutional neural net](http://www.cs.berkeley.edu/~jonlong/long_shelhamer_fcn.pdf). These are easier to use but they tend to give a rather coarse resolution when you go deep. There are some papers about using [conditional random fields or recurrent nets](http://www.robots.ox.ac.uk/~szheng/papers/CRFasRNN.pdf) as a post processing to improve the detail. However, both approached did not really appeal to me due to the added complexity. Also in this example there were only two classes. [Here](https://github.com/kjw0612/awesome-deep-vision#semantic-segmentation) us an exaustive list of various approaches.
+When search the literature 2 months ago on image segmentation with CNN's there is no clear "winner" architecture. There were the reasonably successful [sliding widow approaches](http://people.idsia.ch/~ciresan/data/ISBI2012.pdf). However, from first hand experience I knew they were a bit cumbersome to use and far from perfect. The benchmark example provided by Mike Kim used a [fully convolutional neural net](http://www.cs.berkeley.edu/~jonlong/long_shelhamer_fcn.pdf). These are easier to use but they tend to give a rather coarse resolution when you go deep. There are some papers about using [conditional random fields or recurrent nets](http://www.robots.ox.ac.uk/~szheng/papers/CRFasRNN.pdf) as post processing to improve the detail. However, both approached did not really appeal to me due to the added complexity. [Here](https://github.com/kjw0612/awesome-deep-vision#semantic-segmentation) is an exaustive list of various approaches.
 
 It was a lucky accident that I stumbled upon the paper on the [u-net architecture](http://lmb.informatik.uni-freiburg.de/people/ronneber/u-net/). This architectured allowed for more detail in the segmentation by using shortcut connections from the i'th layer to the n-i'th layer. They presented a number of impressive results and as far as I could see the person that came up with the architecture now works for Google Deepmind. To me that proved that appearantly he was on to something.  Below is a schematic overview.
 
@@ -71,7 +71,7 @@ Below the architecture is displayed. Note that my approach is very much trial an
 *Figure 5. Network definition used for this solution*
 
 The segmentation results were quite impressive. The "easy cases" where virtually perfect. Cases where the LV tissue was only half around were nicely filled up with a "half moon"-like overlay. There were some cases where the net was confused but this was almost always due to strange outliers of which it never had seen any examples before.
-Patients with many heavily contracted LV's seemed to be a little underestimated by the system. This is probably because I should have labeled contracted LV's more generous. Below, a few cases are discussed.
+Patients with many heavily contracted LV's seemed to be a little underestimated by the system. This is probably because I should have labeled contracted LV's more generous. Below, a few cases are shown.
 
 ![Segmentation](/images/segmentations.png)
 *Figure 6. Segmentation results. A. Normal. B. Heavy contraction.  C. Chamber only partly surrounded by LV tissue D. and E. Uncommon cases where the u-net was confused.*
@@ -79,24 +79,24 @@ Patients with many heavily contracted LV's seemed to be a little underestimated 
 
 ## Integrating the predictions into volumes and data cleaning.
 Theoretically, once you have the LV areas per slice, the step to compute the volumes is straight forward. You take the slice areas and multiply by their thickness and then sum. You can even be more fancy and compute the volumes using frustum of a cone approximations like in the tutorials. I did that but it only gave a small improvement.
-It was much more beneficial to put more effort in the data cleaning process. Taking MRI's is obviously a very error prone process and many computations went wrong because of irregularities in the data. Below a number of essential cleaning steps are discussed.
+It was much more beneficial to put extra effort in the data cleaning process. Taking MRI's is obviously a very error prone process and many computations went wrong because of irregularities in the data. Below some common problems are discussed.
 
 1. *Patients with virtually no slices.*<br>
    Patient 595 and 599 only had 3 slices. I decided to drop them and predict their volumes later on based on averages for age and sex.
 2. *No real guide for slice thickness.*<br>
   I eventually used the difference between slice locations to determine the slice thickness. Although the slice location was not 100% perfect other calculations based on image orientation and location also had their problems so I settled for the simplest option.
 3. *Slice ordering.*<br>
-  Usually the MRI makes slices from the base downto the apex. But sometimes the machines seemed to get stuck or went back up again. This would result in negative slice thickneses. The fix was to order the slices based on location and not in time.
+  Usually the MRI makes slices from the base downto the apex. But sometimes the machines seemed to get stuck or went back up again. This would result in negative slice thicknesses. The fix was to order the slices based on location and not in time.
 4. *Out of range slices.*<br>
-  After ordering the slices I sometimes noticed thicknesses of 100+ mm. Since the expected thickness was around 10mm I concluded that these slices were wrong so I dropped them.
+  After ordering the slices I sometimes noticed thicknesses of 100+ mm. Since the expected thickness was around 10mm I concluded that these slices were out of rangs (stomach, neck) so I dropped them.
 5. *Missing slices.*<br>
-  After putting in a maximum slice thickness there turned out to be some sliced that were 20 or even more mm but they were valid. My conclusion was that in these cases slices were missing in the sequence.
-  My measure against this was to allow for these slices as long as they fell between the base and the apex.
+  After putting in a maximum slice thickness there turned out to be some sliced that were 20 or even more mm but they were valid. My conclusion was that in these cases other slices in the sequence were missing.
+  My measure against this was to allow for these big slices as long as they fell between the base and the apex.
 6. *Wrongly oriented slices.*<br>
   In a very few occasions slices would suddenly be rotated. Luckily my segmenter did not suffer from this so there was no need to take measures against this.
  
-Another important point to not is that two volumes need to be determined at the same time. Systole (contracted) and Diastole (expanded).
-I tried two approaches for determining which frames where Systole and Diastole. The first was the frame with total volume max and min. Second was to find the image with the larges area and use that frame as diastole. Then within that series look for the smallest area and use that frame as systole.
+Another important point to not is that two volumes need to be determined at the same time. Namely systole (contracted) and diastole (expanded).
+I tried two approaches for determining which frames where systole and diastole. The first was to take the frame with total volume maximum volume as diastole and the one with the minimum volume as systole. The second method was to find the image with the larges area and use that frame as diastole. Then within that series look for the smallest area and use that frame as systole.
 The second approach is probably what doctors do but somehow the first approach was more stable and worked better with the calibration step that followed. My guess the reason is that the first approach is more consistent. It structurally a bit too low for systole and a bit too high for diastole. This signal 
 can easily be picked up by the gradient boosting procedure that I used for calibrating the volumes.
 
@@ -138,7 +138,7 @@ Before the competition the doctors told during a Q&A session that errors 10ml wo
 
 
 ## Thanks	
-1. *Kaggle and Booz Allen Hamilton.*<br> Thank you organising this complex and cool challenge. There were some complaints about the whole two phase setup and the quality of the data. But if we want to solve more ambitious problems than the usual CTR/forecasting stuff you sometimes need to try something new an take some risk.
+1. *Kaggle and Booz Allen Hamilton.*<br> Thank you for organizing this complex and cool challenge. There were some complaints about the whole two phase setup and the quality of the data. But if we want to take on more ambitious problems than the usual CTR/forecasting stuff you sometimes need to try something new an take some risk.
 
 2. *Mxnet.*<br> What can I say... great library when you also want to deploy your systems in real-world situations. Especially good windows support is something that is severely lacking from most other libraries.
 
