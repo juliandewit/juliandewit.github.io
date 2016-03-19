@@ -53,9 +53,9 @@ After getting an example running I started to experiment with different paramete
 
 1. Segmentation nets are numerically unstable. I relied heavily on batch normalization.
 2. Smaller batch sizes yielded better scores and stability. I settled for batchsize = 2.
-3. Elastic deformations were by far the most augmentations
-4. The shortcut connection give a significant improvement during training. 
-5. Logistic regression was better loss than RMSE but better alternative quite possibly exist.
+3. Elastic deformations were by far the most effective augmentations
+4. The shortcut connection gave a significant improvement in accuracy. 
+5. Logistic regression was better loss than RMSE but even better alternatives quite possibly exist.
 6. Dropout helped but it was hard to determine where to apply it. I choose upstream after the shortcut merges.
 7. Adding more layers quickly led to diminishing returns
 8. Adding more filters per layer quicky showed no improvement
@@ -67,29 +67,29 @@ Note that I used relu activations and batch normalization after every convolutio
 I used padding for the convolutional layers to not let them decrease output shape.
 Below the architecture is displayed. Note that my approach is very much trial and error and many decisions don't have a grounded theory.
 
-The seqmentation results were quite impressive. They "easy cases" where virtually perfect. Only with very big hearts sometimes the net was a bit unsure. Cases where the LV tissue was only half around were nicely filled up with a "half moon"-like overlay. There were some cases where the net was confused but this was almost always with strange outliers of which it never had seen any examples.
+The seqmentation results were quite impressive. They "easy cases" where virtually perfect. Cases where the LV tissue was only half around were nicely filled up with a "half moon"-like overlay. There were some cases where the net was confused but this was almost always with strange outliers of which it never had seen any examples before.
 Patients with many heavily contracted LV's seemed to be a little underestimated by the system. This is probably because I should have labeled contracted LV's more generous. Below, a few cases are discussed.
 
 ![Segmentation](/images/segmentations.png)
-*Figure 6. A. Normal. B. Heavy contraction.  C. Chamber only partly surrounded by LV tissue D. and E. Uncommon cases where the u-net was confused.*
+*Figure 6. Segmentation results. A. Normal. B. Heavy contraction.  C. Chamber only partly surrounded by LV tissue D. and E. Uncommon cases where the u-net was confused.*
 
 
 ## Integrating the predictions into volumes and data cleaning.
-Theoretically, once you have the LV areas per slice, the step to compute the volumes is straight forward. You take the slice areas and multiply by their thickness and then add. You can even be more fancy and compute the volumes using frustum of a cone approximations like in the tutorials. I did that but it only gave a small improvement.
+Theoretically, once you have the LV areas per slice, the step to compute the volumes is straight forward. You take the slice areas and multiply by their thickness and then sum. You can even be more fancy and compute the volumes using frustum of a cone approximations like in the tutorials. I did that but it only gave a small improvement.
 It was much more beneficial to put more effort in the data cleaning process. Taking MRI's is obviously a very error prone process and many computations went wrong because of irregularities in the data. Below a number of essential cleaning steps are discussed.
 
-1. Patients with virtually no slices.<br>
+1. *Patients with virtually no slices.*<br>
    Patient 595 and 599 only had 3 slices. I decided to drop them and predict their volumes later on based on averages for age and sex.
-2. No real guide for slice thickness.<br>
+2. *No real guide for slice thickness.*<br>
   I eventually used the difference between slice locations to determine the slice thickness. Although the slice location was not 100% perfect other calculations based on image orientation and location also had their problems so I settled for the simplest option.
-3. Slice ordering.<br>
+3. *Slice ordering.*<br>
   Usually the MRI makes slices from the base downto the apex. But sometimes the machines seemed to get stuck or went back up again. This would result in negative slice thickneses. The fix was to order the slices based on location and not in time.
-4. Out of range slices.<br>
+4. *Out of range slices.*<br>
   After ordering the slices I sometimes noticed thicknesses of 100+ mm. Since the expected thickness was around 10mm I concluded that these slices were wrong so I dropped them.
-5. Missing slices.<br>
+5. *Missing slices.*<br>
   After putting in a maximum slice thickness there turned out to be some sliced that were 20 or even more mm but they were valid. My conclusion was that in these cases slices were missing in the sequence.
   My measure against this was to allow for these slices as long as they fell between the base and the apex.
-6. Wrongly oriented slices.<br>
+6. *Wrongly oriented slices.*<br>
   In a very few occasions slices would suddenly be rotated. Luckily my segmenter did not suffer from this so there was no need to take measures against this.
  
 Another important point to not is that two volumes need to be determined at the same time. Systole (contracted) and Diastole (expanded).
@@ -117,11 +117,11 @@ The resulting values were used for my submission. This was a simple and stable p
 First of all I'm very happy with the resulting model. It is simple and straightforward and there are a number of possible improvements if one were to use this model in a real-life scenario.
 Below are a number of possible improvements.
 
-1. Hand-labeling by a real expert.
+1. *Hand-labeling by a real expert.*
 I am convinces that I labeled some of the cases completely wrong. Labels provided by experts would most likely drastically improve the performance.
-2. Active learning (boost hard examples)
+2. *Active learning (boost hard examples).*
 I was afraid to boost the train images of cases where the segmenter had a hard time. People might accuse me of cheating. However [active learning](https://en.wikipedia.org/wiki/Active_learning_(machine_learning)) is a perfectly valid aproach for improving the performance of a system like this.
-3. Cleaner data
+3. *Cleaner data.*
 The outliers in this dataset were very important in this competition. A small number of patients were responsible for the biggest loss in performance. Of course I investigated them thouroughly. However, in many cases I could not find a problem in my estimated volumes. My conclusion was that the provided volumes were plain wrong.
 The biggest outlier was [patient 429](https://www.kaggle.com/c/second-annual-data-science-bowl/forums/t/18372/some-cases-are-quite-off-from-the-true-value/104711) this patient alone was responsible for a 89ml error. Until now there is still no explanation for this strange value.
 Cases like this confused the calibration step and increased the standard deviation during the submission so they had a big impact on the final score.
@@ -132,11 +132,11 @@ Before the competition the doctors told during a Q&A session that errors 10ml wo
 
 
 ## Thanks
-1. Kaggle and Booz Allen Hamilton<br> Thank you organising this complex and col challenge. There were some complaints about the whole two phase setup and the quality of the data. But if we want to solve more relevant problems instead of the usual CTR/forecasting stuff you sometimes need to try something new an take some risk.
+1. *Kaggle and Booz Allen Hamilton.*<br> Thank you organising this complex and cool challenge. There were some complaints about the whole two phase setup and the quality of the data. But if we want to solve more ambitious problems than the usual CTR/forecasting stuff you sometimes need to try something new an take some risk.
 
-2. Mxnet<br> What can I say... great library especially when you also want to deploy your systems in real-world situation. Especially good windows support is something that is severely lacking from other libraries.
+2. *Mxnet.*<br> What can I say... great library when you also want to deploy your systems in real-world situation. Especially good windows support is something that is severely lacking from other libraries.
 
-3. The authors of the U-net paper.. <br> The idea was great. The paper was easy to understand with clear language and concrete examples. That is something you do not find everyday in many of the deep learning community.
+3. *The authors of the U-net paper.* <br> The idea was great. The paper was easy to understand with clear language and concrete examples. That is something you do not find everyday in the deep learning community.
 
 
 
