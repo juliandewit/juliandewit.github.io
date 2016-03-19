@@ -33,7 +33,7 @@ The traindata of the competition only contained the final determined volumes of 
 Since every patient had around 10 slices that meant that I had to label around 2000 images. Once I got the hang of it using my tool I was able to label around 1 patient per minute. During the labeling I encountered many confusing cases that I still don't know how to label. I scanned youtube and many papers but there were no definate answers on the internet. In the end I decided to at least be consistent. If I would be consistent then in a later stage I could brush out systematic errors during the calibration phase. Below are a number of situations that were encountered. 
 
 ![Labeling](/images/labeling.png)
-*Figure 3. Labeling cases. A. was easy. B. was harder since I did not know if only the white (bloodpool) should be annoted or that the tissue should be interpreted like sponge C. Chamber only partly surrounded by LV tissue D. and E. Uncommon cases that I did not know how to handle.*
+*Figure 3. A. Easy. B. Harder since it was unclear if only the white (bloodpool) should be annoted or that the tissue should be interpreted like sponge C. Chamber only partly surrounded by LV tissue D. and E. Uncommon confusing cases .*
 
 After I trained a segmented on the 100 patients and made a first submission (#3 at that time while the competition was already 2 months underway my confidence of my approach grew. That motivated me to improve my segmenter and label more images. Most people call this boring work but I actually enjoyed the labeling. Even if you are out of ideas you still have the feeling that you are making progress. Also many high-payed overworked cardiac experts must devote a large portion of their time to this work. I figured that if I did my work right my effort would be neglectable to the effort that could be spared with the final solution. I did However notice more and more diminishing returns for every new batch I labeled.
 
@@ -45,7 +45,7 @@ When search the literature 2 months ago on image segmentation with CNN's there i
 It was a lucky accident that I stubled upon the paper on the [u-net architecture](http://lmb.informatik.uni-freiburg.de/people/ronneber/u-net/). This architectured allowed for more detail in the segmentation by using shortcut connections from the i'th layer to the n-i'th layer. They presented a number of impressive results and as far as I could see the person that came up with the architecture now works for Google Deepmind. To me that proved that appearantly he was on to something.  Below is a schematic overview.
 
 ![U-net](/images/unet.png)
-*Figure x. U-net architecture*
+*Figure 4. U-net architecture*
 
 The paper was very clear and readable and I had a prototype running in [mxnet](https://github.com/dmlc/mxnet) without much effort. As someone that deploys deep learning systems to various targets (embedded, windows, linux, cloud etc) in various programming languages (python, c++, c#) I really recommend this library. 
 
@@ -69,6 +69,10 @@ Below the architecture is displayed. Note that my approach is very much trial an
 
 The seqmentation results were quite impressive. They "easy cases" where virtually perfect. Only with very big hearts sometimes the net was a bit unsure. Cases where the LV tissue was only half around were nicely filled up with a "half moon"-like overlay. There were some cases where the net was confused but this was almost always with strange outliers of which it never had seen any examples.
 Patients with many heavily contracted LV's seemed to be a little underestimated by the system. This is probably because I should have labeled contracted LV's more generous. Below, a few cases are discussed.
+
+![Segmentation](/images/segmentation.png)
+*Figure 3. A. Normal. B. Heavy contraction.  C. Chamber only partly surrounded by LV tissue D. and E. Uncommon cases where the u-net was confused.*
+
 
 ## Integrating the predictions into volumes and data cleaning.
 Theoretically, once you have the LV areas per slice, the step to compute the volumes is straight forward. You take the slice areas and multiply by their thickness and then add. You can even be more fancy and compute the volumes using frustum of a cone approximations like in the tutorials. I did that but it only gave a small improvement.
