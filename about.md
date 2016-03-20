@@ -4,12 +4,10 @@ title: About
 permalink: /about/
 ---
 
-Some information about you!
+Freelance software developer.
+I love implementing Machine Learning/AI algorithms and systems.
 
-### More Information
-
-A place to include any other types of information that you'd like to include about yourself.
 
 ### Contact me
 
-[email@domain.com](mailto:email@domain.com)
+[juliadn@dwssystemen.nl](mailto:juliadn@dwssystemen.nl)
