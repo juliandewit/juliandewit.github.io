@@ -139,6 +139,9 @@ Before the competition the doctors told during a Q&A session that errors 10ml wo
 ![Solved](/images/solved.png)
 
 
+## Code
+The code can be found [here](https://github.com/juliandewit/kaggle_ndsb2)	
+
 ## Thanks	
 1. *Kaggle and Booz Allen Hamilton.*<br> Thank you for organizing this complex and cool challenge. There were some complaints about the whole two phase setup and the quality of the data. But if we want to take on more ambitious problems than the usual CTR/forecasting stuff you sometimes need to try something new an take some risk.
 
